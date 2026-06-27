@@ -226,7 +226,7 @@
         .qs-tile .qs-label { font-size: 14px; font-weight: 500; }
         .qs-close { position: absolute; bottom: 60px; width: 100%; text-align: center; font-size: 12px; color: rgba(255,255,255,0.6); }
 
-        /* --- APP WINDOW (Settings) --- */
+        /* --- APP WINDOWS (Settings, Messages, Camera, Calendar) --- */
         .app-window {
             background-color: var(--bg-color);
             z-index: 200; display: flex; flex-direction: column;
@@ -234,16 +234,21 @@
             padding-bottom: 44px; 
         }
         
-        .settings-header { padding: 40px 20px 10px; color: var(--on-surface); }
-        .settings-header h2 { font-size: 28px; font-weight: 400; }
-        .settings-search {
+        .settings-header, .msg-header { padding: 40px 20px 10px; color: var(--on-surface); }
+        .settings-header h2, .msg-header h2 { font-size: 28px; font-weight: 400; }
+        
+        .settings-search, .msg-search {
             margin: 10px 20px 20px; background-color: var(--surface-variant);
             border-radius: 30px; padding: 12px 20px;
             display: flex; align-items: center; gap: 10px; color: var(--on-surface-variant);
+            border: none; width: calc(100% - 40px);
+            font-size: 15px; outline: none;
         }
-        .settings-list { flex: 1; overflow-y: auto; padding: 0 16px 40px; }
-        .settings-list::-webkit-scrollbar { width: 4px; }
-        .settings-list::-webkit-scrollbar-thumb { background: var(--outline); border-radius: 4px; }
+
+        .settings-list, .msg-list { flex: 1; overflow-y: auto; padding: 0 16px 20px; }
+        .settings-list::-webkit-scrollbar, .msg-list::-webkit-scrollbar { width: 4px; }
+        .settings-list::-webkit-scrollbar-thumb, .msg-list::-webkit-scrollbar-thumb { background: var(--outline); border-radius: 4px; }
+
         .settings-card {
             background-color: var(--surface-color); border-radius: 28px;
             overflow: hidden; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
@@ -297,6 +302,183 @@
             background: var(--primary-color); cursor: pointer;
         }
 
+        /* --- Messages App Specifics --- */
+        .msg-list-item {
+            display: flex; align-items: center; padding: 12px 20px;
+            cursor: pointer; gap: 16px; border-bottom: 1px solid var(--surface-variant);
+        }
+        .msg-list-item:hover { background-color: var(--surface-variant); }
+        .msg-avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 20px; color: white; font-weight: 500;
+        }
+        .msg-preview { flex: 1; overflow: hidden; }
+        .msg-preview .name { font-weight: 500; color: var(--on-surface); font-size: 16px; }
+        .msg-preview .text { font-size: 14px; color: var(--on-surface-variant); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+        .msg-time { font-size: 12px; color: var(--on-surface-variant); align-self: flex-start; margin-top: 4px; }
+        .no-results { text-align: center; color: var(--on-surface-variant); margin-top: 40px; font-size: 15px; }
+
+        /* Chat Thread Slide-in Animation */
+        #msg_thread.active {
+            animation: slideInRight 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .chat-container {
+            flex: 1; padding: 20px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .chat-bubble {
+            max-width: 75%; padding: 12px 16px; border-radius: 20px;
+            font-size: 15px; line-height: 1.4; position: relative;
+            word-wrap: break-word;
+            animation: popIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .chat-bubble.received {
+            background: var(--surface-variant); color: var(--on-surface);
+            align-self: flex-start; border-bottom-left-radius: 4px;
+        }
+        .chat-bubble.sent {
+            background: var(--primary-color); color: var(--on-primary);
+            align-self: flex-end; border-bottom-right-radius: 4px;
+        }
+        
+        /* Typing Indicator Dots */
+        .chat-bubble.typing-dots {
+            display: flex; gap: 4px; align-items: center;
+            padding: 14px 18px;
+        }
+        .chat-bubble.typing-dots .dot {
+            width: 8px; height: 8px; background-color: var(--on-surface-variant);
+            border-radius: 50%; animation: bounce 1s infinite;
+        }
+        .chat-bubble.typing-dots .dot:nth-child(2) { animation-delay: 0.2s; }
+        .chat-bubble.typing-dots .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .chat-input-bar {
+            display: flex; padding: 10px 20px 20px; gap: 10px;
+            background: var(--surface-color); border-top: 1px solid var(--surface-variant);
+        }
+        .chat-input-bar input {
+            flex: 1; background: var(--surface-variant); border: none;
+            border-radius: 24px; padding: 12px 20px; color: var(--on-surface);
+            outline: none; font-size: 15px;
+        }
+        .send-btn {
+            width: 44px; height: 44px; background: var(--primary-color);
+            color: var(--on-primary); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; font-size: 18px;
+        }
+        .send-btn:active { transform: scale(0.9); }
+
+        /* --- Camera App Specifics --- */
+        #cameraApp {
+            background: #000;
+            z-index: 200;
+            padding-bottom: 0; 
+        }
+        #cameraVideo {
+            width: 100%; height: 100%; object-fit: cover; background: #111;
+        }
+        .camera-error {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: white; text-align: center; font-size: 16px; display: none;
+        }
+        .camera-controls {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 140px;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around; align-items: center;
+            padding-bottom: 20px; z-index: 10;
+        }
+        .thumb-preview {
+            width: 50px; height: 50px; border-radius: 8px; background: #333;
+            background-size: cover; background-position: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .shutter-btn {
+            width: 70px; height: 70px; background: white; border-radius: 50%;
+            border: 4px solid rgba(255,255,255,0.3); box-shadow: 0 0 0 4px rgba(0,0,0,0.2);
+            cursor: pointer; transition: transform 0.1s;
+        }
+        .shutter-btn:active { transform: scale(0.9); }
+        .flip-btn {
+            width: 44px; height: 44px; background: rgba(255,255,255,0.2);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 20px; cursor: pointer;
+        }
+        .flip-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.4); }
+        
+        #cameraFlash {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; opacity: 0; pointer-events: none; z-index: 20;
+            transition: opacity 0.2s;
+        }
+
+        /* --- Calendar App Specifics --- */
+        .cal-header {
+            padding: 40px 20px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            color: var(--on-surface);
+        }
+        .cal-header h2 { font-size: 24px; font-weight: 400; }
+        .cal-nav { display: flex; gap: 10px; }
+        .cal-nav-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            background: var(--surface-variant); color: var(--on-surface-variant);
+            cursor: pointer; font-size: 18px;
+        }
+        .cal-nav-btn:active { transform: scale(0.9); }
+        
+        .cal-weekdays {
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            text-align: center; color: var(--on-surface-variant);
+            font-size: 12px; margin-bottom: 10px; padding: 0 10px;
+        }
+        .cal-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            gap: 2px; padding: 0 10px;
+        }
+        .cal-day {
+            aspect-ratio: 1; display: flex; justify-content: center; align-items: center;
+            border-radius: 50%; color: var(--on-surface); font-size: 14px;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+        .cal-day:hover { background: var(--surface-variant); }
+        .cal-day.today {
+            background: var(--primary-color); color: var(--on-primary); font-weight: 500;
+        }
+        .cal-day.other-month { color: var(--outline); opacity: 0.5; }
+        
+        .cal-fab {
+            position: absolute; bottom: 70px; right: 20px;
+            width: 56px; height: 56px; background: var(--primary-color);
+            color: var(--on-primary); border-radius: 18px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 28px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .cal-fab:active { transform: scale(0.9); }
+        .cal-fab.pulse { animation: fabPulse 0.3s; }
+        @keyframes fabPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
         /* --- Recents View --- */
         #recentsView {
             background: rgba(0, 0, 0, 0.7);
@@ -307,14 +489,10 @@
         }
         .recents-empty { color: white; font-size: 16px; opacity: 0.7; }
         .recents-card {
-            width: 340px; height: 550px;
-            background: var(--bg-color);
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            overflow: hidden;
-            display: flex; flex-direction: column;
-            position: relative;
-            cursor: grab;
+            width: 340px; height: 550px; background: var(--bg-color);
+            border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden; display: flex; flex-direction: column;
+            position: relative; cursor: grab;
         }
         .recents-card-header {
             padding: 15px 20px; color: var(--on-surface);
@@ -382,20 +560,20 @@
             <div class="search-bar"><span>🔍</span><span>Search Google</span></div>
             
             <div class="app-grid" id="appGrid">
-                <div class="app-icon" draggable="true"><div class="icon-img" style="background:#4285F4">💬</div><div class="icon-label">Messages</div></div>
+                <div class="app-icon" draggable="true" onclick="openMessages()"><div class="icon-img" style="background:#4285F4">💬</div><div class="icon-label">Messages</div></div>
                 <div class="app-icon" draggable="true"><div class="icon-img" style="background:#34A853">📞</div><div class="icon-label">Phone</div></div>
-                <div class="app-icon" draggable="true"><div class="icon-img" style="background:#EA4335">📷</div><div class="icon-label">Camera</div></div>
+                <div class="app-icon" draggable="true" onclick="openCamera()"><div class="icon-img" style="background:#EA4335">📷</div><div class="icon-label">Camera</div></div>
                 <div class="app-icon" draggable="true" onclick="openSettings()"><div class="icon-img" style="background:#FFB300">⚙️</div><div class="icon-label">Settings</div></div>
-                <div class="app-icon" draggable="true"><div class="icon-img" style="background:#673AB7">📅</div><div class="icon-label">Calendar</div></div>
+                <div class="app-icon" draggable="true" onclick="openCalendar()"><div class="icon-img" style="background:#673AB7">📅</div><div class="icon-label">Calendar</div></div>
                 <div class="app-icon" draggable="true"><div class="icon-img" style="background:#009688">🕐</div><div class="icon-label">Clock</div></div>
                 <div class="app-icon" draggable="true"><div class="icon-img" style="background:#FF5722">🔥</div><div class="icon-label">Chrome</div></div>
                 <div class="app-icon" draggable="true"><div class="icon-img" style="background:#795548">📁</div><div class="icon-label">Files</div></div>
             </div>
 
             <div class="dock" id="dock">
-                <div class="app-icon"><div class="icon-img" style="background:#4285F4">✉️</div></div>
+                <div class="app-icon" onclick="openMessages()"><div class="icon-img" style="background:#4285F4">✉️</div></div>
                 <div class="app-icon"><div class="icon-img" style="background:#34A853">🧭</div></div>
-                <div class="app-icon"><div class="icon-img" style="background:#EA4335">🎵</div></div>
+                <div class="app-icon" onclick="openCamera()"><div class="icon-img" style="background:#EA4335">🎵</div></div>
                 <div class="app-icon" onclick="openSettings()"><div class="icon-img" style="background:#FFB300">⚙️</div></div>
             </div>
         </div>
@@ -448,13 +626,12 @@
                         </div>
                         <div class="settings-item" onclick="showSubpage('sp_about')">
                             <div class="settings-icon-box" style="background:#D0E2FF; color:#00497A">ℹ️</div>
-                            <div class="settings-text"><div class="title">About phone</div><div class="subtitle">OSes.online Developer Release 1.2.6</div></div>
+                            <div class="settings-text"><div class="title">About phone</div><div class="subtitle">OSes.online Gen 1</div></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Network Subpage -->
             <div class="subpage" id="sp_network">
                 <div class="subpage-header"><div class="back-btn" onclick="showSubpage('sp_main')">←</div><div class="subpage-title">Network & internet</div></div>
                 <div class="settings-list">
@@ -471,32 +648,24 @@
                 </div>
             </div>
 
-            <!-- Bluetooth / Connected Devices Subpage -->
             <div class="subpage" id="sp_bluetooth">
                 <div class="subpage-header"><div class="back-btn" onclick="showSubpage('sp_main')">←</div><div class="subpage-title">Connected devices</div></div>
                 <div class="settings-list">
                     <div class="settings-card">
                         <div class="settings-item">
-                            <div class="settings-text">
-                                <div class="title">Bluetooth</div>
-                                <div class="subtitle" id="bt_status_subtitle">Pixel Buds Pro connected</div>
-                            </div>
+                            <div class="settings-text"><div class="title">Bluetooth</div><div class="subtitle" id="bt_status_subtitle">Pixel Buds Pro connected</div></div>
                             <div class="settings-toggle on" onclick="toggleSetting(this, 'bt')"></div>
                         </div>
                     </div>
                     <div class="settings-card">
                         <div class="settings-item">
                             <div class="settings-icon-box" style="background:#E8DEF8; color:#6750A4">🎧</div>
-                            <div class="settings-text">
-                                <div class="title">Pixel Buds Pro</div>
-                                <div class="subtitle">Connected • 85% battery</div>
-                            </div>
+                            <div class="settings-text"><div class="title">Pixel Buds Pro</div><div class="subtitle">Connected • 85% battery</div></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Display Subpage -->
             <div class="subpage" id="sp_display">
                 <div class="subpage-header"><div class="back-btn" onclick="showSubpage('sp_main')">←</div><div class="subpage-title">Display</div></div>
                 <div class="settings-list">
@@ -512,7 +681,6 @@
                 </div>
             </div>
 
-            <!-- Sound Subpage -->
             <div class="subpage" id="sp_sound">
                 <div class="subpage-header"><div class="back-btn" onclick="showSubpage('sp_main')">←</div><div class="subpage-title">Sound & vibration</div></div>
                 <div class="settings-list">
@@ -527,7 +695,6 @@
                 </div>
             </div>
 
-            <!-- Battery Subpage -->
             <div class="subpage" id="sp_battery">
                 <div class="subpage-header"><div class="back-btn" onclick="showSubpage('sp_main')">←</div><div class="subpage-title">Battery</div></div>
                 <div class="settings-list">
@@ -542,7 +709,6 @@
                 </div>
             </div>
 
-            <!-- About Subpage -->
             <div class="subpage" id="sp_about">
                 <div class="subpage-header"><div class="back-btn" onclick="showSubpage('sp_main')">←</div><div class="subpage-title">About phone</div></div>
                 <div class="settings-list">
@@ -556,11 +722,60 @@
             </div>
         </div>
 
-        <!-- 6. Recents View -->
-        <div id="recentsView" class="screen hidden">
-            <div id="recentsContainer" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
-                <!-- Apps injected by JS -->
+        <!-- 6. Messages App Window -->
+        <div id="messagesApp" class="screen app-window hidden">
+            <div class="subpage active" id="msg_list">
+                <div class="msg-header"><h2>Messages</h2></div>
+                <input type="text" id="msgSearchInput" class="msg-search" placeholder="🔍 Search conversations" oninput="renderMessageList(this.value)">
+                <div class="msg-list" id="msgListContainer"></div>
             </div>
+            <div class="subpage" id="msg_thread">
+                <div class="subpage-header">
+                    <div class="back-btn" onclick="showMsgSubpage('msg_list')">←</div>
+                    <div id="msgThreadName" class="subpage-title">Chat</div>
+                </div>
+                <div class="chat-container" id="chatContainer"></div>
+                <div class="chat-input-bar">
+                    <input type="text" id="chatInput" placeholder="Text message" onkeypress="handleChatKeyPress(event)">
+                    <div class="send-btn" onclick="sendMessage()">➤</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Camera App Window -->
+        <div id="cameraApp" class="screen app-window hidden">
+            <video id="cameraVideo" autoplay playsinline></video>
+            <div class="camera-error" id="cameraError">
+                <span style="font-size: 40px; display: block; margin-bottom: 10px;">🚫</span>
+                Camera not available.<br>Please allow camera access in your browser.
+            </div>
+            <div class="camera-controls">
+                <div class="thumb-preview" id="cameraThumb"></div>
+                <div class="shutter-btn" onclick="capturePhoto()"></div>
+                <div class="flip-btn" onclick="flipCamera()">🔄</div>
+            </div>
+            <div id="cameraFlash"></div>
+        </div>
+
+        <!-- 8. Calendar App Window -->
+        <div id="calendarApp" class="screen app-window hidden">
+            <div class="cal-header">
+                <h2 id="calMonthYear">Month Year</h2>
+                <div class="cal-nav">
+                    <div class="cal-nav-btn" onclick="prevMonth()">‹</div>
+                    <div class="cal-nav-btn" onclick="nextMonth()">›</div>
+                </div>
+            </div>
+            <div class="cal-weekdays">
+                <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="cal-fab" id="calFab" onclick="triggerFab()">+</div>
+        </div>
+
+        <!-- 9. Recents View -->
+        <div id="recentsView" class="screen hidden">
+            <div id="recentsContainer" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;"></div>
             <div class="swipe-hint">Drag app cards up to dismiss</div>
         </div>
 
@@ -584,6 +799,9 @@
         const homeScreen = document.getElementById('homeScreen');
         const quickSettings = document.getElementById('quickSettings');
         const settingsApp = document.getElementById('settingsApp');
+        const messagesApp = document.getElementById('messagesApp');
+        const cameraApp = document.getElementById('cameraApp');
+        const calendarApp = document.getElementById('calendarApp');
         const appGrid = document.getElementById('appGrid');
         const brightnessOverlay = document.getElementById('brightnessOverlay');
         const recentsView = document.getElementById('recentsView');
@@ -594,11 +812,39 @@
         const correctPin = "1234"; 
         let openApps = []; 
         let currentSubpage = 'sp_main';
+        let currentMsgSubpage = 'msg_list';
+        let activeChat = null;
         let hasDragged = false;
+        let cameraStream = null;
+        let currentFacingMode = 'user';
+        let calMonth = new Date().getMonth();
+        let calYear = new Date().getFullYear();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        // --- Messages Data ---
+        const colors = ['#6750A4', '#009688', '#FF5722', '#795548', '#673AB7', '#EA4335'];
+        let conversations = {
+            "Alice": [
+                { text: "Hey! Are we still on for today?", sent: false, time: "10:30 AM" },
+                { text: "Yes! See you at 12.", sent: true, time: "10:32 AM" },
+                { text: "Perfect, can't wait!", sent: false, time: "10:33 AM" }
+            ],
+            "Bob": [
+                { text: "Did you see the news?", sent: false, time: "Yesterday" },
+                { text: "No, what happened?", sent: true, time: "Yesterday" },
+                { text: "Check your messages, I sent a link.", sent: false, time: "Yesterday" }
+            ],
+            "Mom": [
+                { text: "Call me when you get home.", sent: false, time: "Mon" }
+            ],
+            "Google Security": [
+                { text: "Your verification code is 448821.", sent: false, time: "Tue" }
+            ]
+        };
 
         // --- Core Navigation Logic ---
         function showScreen(screenToShow) {
-            [lockScreen, pinScreen, homeScreen, settingsApp, recentsView].forEach(s => s.classList.add('hidden'));
+            [lockScreen, pinScreen, homeScreen, settingsApp, messagesApp, cameraApp, calendarApp, recentsView].forEach(s => s.classList.add('hidden'));
             screenToShow.classList.remove('hidden');
         }
 
@@ -611,7 +857,6 @@
             let minutes = now.getMinutes();
             minutes = minutes < 10 ? '0' + minutes : minutes;
             
-            // 12-hour format
             let ampm = hours >= 12 ? 'PM' : 'AM';
             let twelveHour = hours % 12 || 12;
             const timeStr = `${twelveHour}:${minutes}`;
@@ -620,7 +865,6 @@
             document.getElementById('qsTime').innerText = timeStr;
             document.getElementById('lockTime').innerText = timeStr;
             
-            // Date formatting
             const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const dateStr = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
@@ -632,6 +876,7 @@
         // --- Navigation Bar Logic ---
         function navHome() {
             closeQuickSettings();
+            stopCamera(); 
             showScreen(homeScreen);
         }
 
@@ -644,12 +889,16 @@
                 showScreen(homeScreen);
                 return;
             }
+            if (!cameraApp.classList.contains('hidden')) { navHome(); return; }
+            if (!calendarApp.classList.contains('hidden')) { navHome(); return; }
             if (!settingsApp.classList.contains('hidden')) {
-                if (currentSubpage !== 'sp_main') {
-                    showSubpage('sp_main');
-                } else {
-                    navHome();
-                }
+                if (currentSubpage !== 'sp_main') showSubpage('sp_main');
+                else navHome();
+                return;
+            }
+            if (!messagesApp.classList.contains('hidden')) {
+                if (currentMsgSubpage !== 'msg_list') showMsgSubpage('msg_list');
+                else navHome();
                 return;
             }
         }
@@ -660,6 +909,7 @@
                 return;
             }
             closeQuickSettings();
+            stopCamera(); 
             renderRecents();
             showScreen(recentsView);
         }
@@ -667,18 +917,289 @@
         // --- App Opening/Resuming Logic ---
         function openApp(appName) {
             if (appName === 'Settings') openSettings();
+            if (appName === 'Messages') openMessages();
+            if (appName === 'Camera') openCamera();
+            if (appName === 'Calendar') openCalendar();
         }
 
         function openSettings() {
             let isAlreadyOpen = openApps.includes('Settings');
-            if (!isAlreadyOpen) {
-                openApps.push('Settings');
-            }
+            if (!isAlreadyOpen) openApps.push('Settings');
             showScreen(settingsApp);
-            
+            if (!isAlreadyOpen) showSubpage('sp_main');
+        }
+
+        function openMessages() {
+            let isAlreadyOpen = openApps.includes('Messages');
+            if (!isAlreadyOpen) openApps.push('Messages');
+            showScreen(messagesApp);
             if (!isAlreadyOpen) {
-                showSubpage('sp_main');
+                showMsgSubpage('msg_list');
+                document.getElementById('msgSearchInput').value = '';
+                renderMessageList('');
             }
+        }
+
+        // --- Messages App Logic ---
+        function renderMessageList(filterQuery = "") {
+            const container = document.getElementById('msgListContainer');
+            container.innerHTML = '';
+            let colorIndex = 0;
+            const query = filterQuery.toLowerCase().trim();
+
+            let resultsFound = false;
+
+            Object.keys(conversations).forEach(name => {
+                const msgs = conversations[name];
+                const lastMsg = msgs[msgs.length - 1];
+                
+                if (query !== "") {
+                    const nameMatches = name.toLowerCase().includes(query);
+                    const textMatches = msgs.some(m => m.text.toLowerCase().includes(query));
+                    if (!nameMatches && !textMatches) return; 
+                }
+                resultsFound = true;
+
+                const color = colors[colorIndex % colors.length];
+                colorIndex++;
+
+                const item = document.createElement('div');
+                item.className = 'msg-list-item';
+                item.onclick = () => openThread(name, color);
+                item.innerHTML = `
+                    <div class="msg-avatar" style="background:${color}">${name.charAt(0)}</div>
+                    <div class="msg-preview">
+                        <div class="name">${name}</div>
+                        <div class="text">${lastMsg.text}</div>
+                    </div>
+                    <div class="msg-time">${lastMsg.time}</div>
+                `;
+                container.appendChild(item);
+            });
+
+            if (!resultsFound) {
+                container.innerHTML = '<div class="no-results">No results found</div>';
+            }
+        }
+
+        function openThread(name, color) {
+            activeChat = name;
+            document.getElementById('msgThreadName').innerText = name;
+            document.getElementById('msgThreadName').style.color = color;
+            showMsgSubpage('msg_thread');
+            renderChat();
+        }
+
+        function renderChat() {
+            const container = document.getElementById('chatContainer');
+            container.innerHTML = '';
+            if (!activeChat || !conversations[activeChat]) return;
+
+            conversations[activeChat].forEach(msg => {
+                const bubble = document.createElement('div');
+                bubble.className = `chat-bubble ${msg.sent ? 'sent' : 'received'}`;
+                
+                if (msg.isTyping) {
+                    bubble.classList.add('typing-dots');
+                    bubble.innerHTML = `<div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
+                } else {
+                    bubble.innerText = msg.text;
+                }
+                container.appendChild(bubble);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // --- Gemini AI Integration ---
+        const API_KEY = atob("QVEuQWI4Uk42SU42aGJQSkxCbkZuSE1RbUlWazFFLW5uYkEwQ2RaSlNYNi1qdUVqNVA0eVE=");
+
+        async function getAIResponse(chatName, messages) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${API_KEY}`;
+
+            const contents = messages.map(msg => ({
+                role: msg.sent ? "user" : "model",
+                parts: [{ text: msg.text }]
+            }));
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        system_instruction: {
+                            parts: [{ text: `You are roleplaying as ${chatName}. You are texting a friend. Keep responses very short, casual, and natural, just like a real SMS text message. 1-2 sentences max.` }]
+                        },
+                        contents: contents
+                    })
+                });
+
+                const data = await response.json();
+                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    return data.candidates[0].content.parts[0].text.trim();
+                } else {
+                    console.error("AI API Error:", data);
+                    return "Sorry, I didn't catch that.";
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                return "Network error.";
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (text === '' || !activeChat) return;
+
+            conversations[activeChat].push({ text: text, sent: true, time: 'Now' });
+            input.value = '';
+            renderChat();
+
+            const isSystemChat = activeChat.toLowerCase().includes("google") || activeChat.toLowerCase().includes("security");
+
+            if (isSystemChat) {
+                setTimeout(() => {
+                    conversations[activeChat].push({ text: "This is an automated system. Do not reply.", sent: false, time: 'Now' });
+                    renderChat();
+                }, 1000);
+            } else {
+                conversations[activeChat].push({ text: "", sent: false, time: 'Now', isTyping: true });
+                renderChat();
+
+                const historyForAI = conversations[activeChat].filter(m => !m.isTyping);
+                const aiText = await getAIResponse(activeChat, historyForAI);
+
+                conversations[activeChat] = conversations[activeChat].filter(m => !m.isTyping);
+                conversations[activeChat].push({ text: aiText, sent: false, time: 'Now' });
+                renderChat();
+            }
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') sendMessage();
+        }
+
+        function showMsgSubpage(pageId) {
+            messagesApp.querySelectorAll('.subpage').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(pageId);
+            if (pageId === 'msg_thread') {
+                page.style.animation = 'none';
+                page.offsetHeight;
+                page.style.animation = '';
+            }
+            page.classList.add('active');
+            currentMsgSubpage = pageId;
+        }
+
+        // --- Camera App Logic ---
+        async function openCamera() {
+            let isAlreadyOpen = openApps.includes('Camera');
+            if (!isAlreadyOpen) openApps.push('Camera');
+            showScreen(cameraApp);
+            await startCamera();
+        }
+
+        async function startCamera() {
+            const video = document.getElementById('cameraVideo');
+            const errorDiv = document.getElementById('cameraError');
+            errorDiv.style.display = 'none';
+
+            if (cameraStream) {
+                video.srcObject = cameraStream;
+                return;
+            }
+
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } });
+                video.srcObject = cameraStream;
+            } catch (err) {
+                console.error("Camera Error:", err);
+                errorDiv.style.display = 'flex';
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+                document.getElementById('cameraVideo').srcObject = null;
+            }
+        }
+
+        async function flipCamera() {
+            currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+            stopCamera();
+            await startCamera();
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('cameraVideo');
+            if (!cameraStream) return;
+
+            const flash = document.getElementById('cameraFlash');
+            flash.style.opacity = '0.8';
+            setTimeout(() => flash.style.opacity = '0', 150);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const dataUrl = canvas.toDataURL('image/png');
+            
+            document.getElementById('cameraThumb').style.backgroundImage = `url(${dataUrl})`;
+        }
+
+        // --- Calendar App Logic ---
+        function openCalendar() {
+            let isAlreadyOpen = openApps.includes('Calendar');
+            if (!isAlreadyOpen) openApps.push('Calendar');
+            showScreen(calendarApp);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calGrid');
+            grid.innerHTML = '';
+            document.getElementById('calMonthYear').innerText = `${monthNames[calMonth]} ${calYear}`;
+
+            const firstDay = new Date(calYear, calMonth, 1).getDay();
+            const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+            const today = new Date();
+
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'cal-day other-month';
+                grid.appendChild(empty);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = document.createElement('div');
+                day.className = 'cal-day';
+                day.innerText = i;
+                if (i === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear()) {
+                    day.classList.add('today');
+                }
+                grid.appendChild(day);
+            }
+        }
+
+        function prevMonth() {
+            calMonth--;
+            if (calMonth < 0) { calMonth = 11; calYear--; }
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            calMonth++;
+            if (calMonth > 11) { calMonth = 0; calYear++; }
+            renderCalendar();
+        }
+
+        function triggerFab() {
+            const fab = document.getElementById('calFab');
+            fab.classList.remove('pulse');
+            fab.offsetHeight; 
+            fab.classList.add('pulse');
         }
 
         // --- Recents View Logic ---
@@ -695,21 +1216,37 @@
                 card.className = 'recents-card';
                 card.setAttribute('data-app', appName);
                 
+                let clone = null;
+                let iconHtml = '';
+
                 if (appName === 'Settings') {
                     const activeSubpage = document.querySelector('#settingsApp .subpage.active');
-                    const clone = activeSubpage.cloneNode(true);
-                    
+                    clone = activeSubpage.cloneNode(true);
+                    iconHtml = `<div style="width:24px; height:24px; background:#FFB300; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px;">⚙️</div> Settings`;
+                } else if (appName === 'Messages') {
+                    const activeSubpage = document.querySelector('#messagesApp .subpage.active');
+                    clone = activeSubpage.cloneNode(true);
+                    iconHtml = `<div style="width:24px; height:24px; background:#4285F4; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px;">💬</div> Messages`;
+                } else if (appName === 'Camera') {
+                    const dummy = document.createElement('div');
+                    dummy.style.cssText = 'width:100%; height:100%; background:#000; display:flex; align-items:center; justify-content:center; color:#555;';
+                    dummy.innerHTML = '<span>Camera Preview Paused</span>';
+                    clone = dummy;
+                    iconHtml = `<div style="width:24px; height:24px; background:#EA4335; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px;">📷</div> Camera`;
+                } else if (appName === 'Calendar') {
+                    clone = calendarApp.cloneNode(true);
+                    clone.style.display = 'flex';
+                    iconHtml = `<div style="width:24px; height:24px; background:#673AB7; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px;">📅</div> Calendar`;
+                }
+
+                if (clone) {
                     const backBtn = clone.querySelector('.back-btn');
                     if (backBtn) backBtn.style.visibility = 'hidden';
-                    
                     clone.style.paddingTop = '0';
                     clone.style.height = '100%';
 
                     card.innerHTML = `
-                        <div class="recents-card-header">
-                            <div style="width:24px; height:24px; background:#FFB300; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px;">⚙️</div>
-                            Settings
-                        </div>
+                        <div class="recents-card-header">${iconHtml}</div>
                         <div class="recents-card-content" style="padding: 0;"></div>
                     `;
                     card.querySelector('.recents-card-content').appendChild(clone);
@@ -859,7 +1396,7 @@
         }
 
         function showSubpage(pageId) {
-            document.querySelectorAll('.subpage').forEach(p => p.classList.remove('active'));
+            settingsApp.querySelectorAll('.subpage').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             currentSubpage = pageId;
         }
