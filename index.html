@@ -842,6 +842,18 @@
             ]
         };
 
+        // --- Profanity Filter Logic ---
+        const badWords = ["damn", "hell", "crap", "ass", "bastard", "bitch", "shit", "fuck", "idiot", "stupid"]; // Add or remove words as needed
+        function filterProfanity(text) {
+            let filteredText = text;
+            // Create a regex that matches whole words, case-insensitive
+            const regex = new RegExp(`\\b(${badWords.join('|')})\\b`, 'gi');
+            filteredText = filteredText.replace(regex, (match) => {
+                return '*'.repeat(match.length); // Replace with asterisks of the same length
+            });
+            return filteredText;
+        }
+
         // --- Core Navigation Logic ---
         function showScreen(screenToShow) {
             [lockScreen, pinScreen, homeScreen, settingsApp, messagesApp, cameraApp, calendarApp, recentsView].forEach(s => s.classList.add('hidden'));
@@ -873,14 +885,29 @@
         setInterval(updateClock, 1000);
         updateClock(); 
 
+        // --- Security & Lock State ---
+        function isLocked() {
+            return !lockScreen.classList.contains('hidden') || !pinScreen.classList.contains('hidden');
+        }
+
         // --- Navigation Bar Logic ---
         function navHome() {
+            if (isLocked()) return; // Prevent bypassing lock screen
             closeQuickSettings();
             stopCamera(); 
             showScreen(homeScreen);
         }
 
         function navBack() {
+            if (isLocked()) {
+                // If on PIN screen, back goes to lock screen
+                if (!pinScreen.classList.contains('hidden')) {
+                    showScreen(lockScreen);
+                    currentPin = "";
+                    updatePinDots();
+                }
+                return;
+            }
             if (quickSettings.classList.contains('active')) {
                 closeQuickSettings();
                 return;
@@ -904,6 +931,7 @@
         }
 
         function navRecents() {
+            if (isLocked()) return; // Prevent bypassing lock screen
             if (!recentsView.classList.contains('hidden')) {
                 navHome();
                 return;
@@ -1027,7 +1055,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         system_instruction: {
-                            parts: [{ text: `You are roleplaying as ${chatName}. You are texting a friend. Keep responses very short, casual, and natural, just like a real SMS text message. 1-2 sentences max.` }]
+                            parts: [{ text: `You are roleplaying as ${chatName}. You are texting a friend. Keep responses very short, casual, and natural, just like a real SMS text message. 1-2 sentences max. Do not use any profanity or offensive language.` }]
                         },
                         contents: contents
                     })
@@ -1048,10 +1076,14 @@
 
         async function sendMessage() {
             const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (text === '' || !activeChat) return;
+            const rawText = input.value.trim();
+            if (rawText === '' || !activeChat) return;
 
-            conversations[activeChat].push({ text: text, sent: true, time: 'Now' });
+            // FILTER USER INPUT
+            const safeText = filterProfanity(rawText);
+
+            // 1. Add user's message
+            conversations[activeChat].push({ text: safeText, sent: true, time: 'Now' });
             input.value = '';
             renderChat();
 
@@ -1067,7 +1099,10 @@
                 renderChat();
 
                 const historyForAI = conversations[activeChat].filter(m => !m.isTyping);
-                const aiText = await getAIResponse(activeChat, historyForAI);
+                let aiText = await getAIResponse(activeChat, historyForAI);
+                
+                // FILTER AI OUTPUT
+                aiText = filterProfanity(aiText);
 
                 conversations[activeChat] = conversations[activeChat].filter(m => !m.isTyping);
                 conversations[activeChat].push({ text: aiText, sent: false, time: 'Now' });
